@@ -4,8 +4,9 @@ import Container from '../layout/Container';
 import Eyebrow from '../common/Eyebrow';
 import Button from '../common/Button';
 import VideoModal from '../common/VideoModal';
-import heroVideo from '../../assets/videos/87838aa2-33d5-45b3-a870-04e685a614ae-stream.mp4';
-import heroAudio from '../../assets/videos/032ff2e1-6364-4ee0-8378-b3d5c0a3be83-audio.mp4';
+// Videos served from public/ folder as static assets (Vercel-compatible, no LFS)
+const heroVideo = '/videos/87838aa2-33d5-45b3-a870-04e685a614ae-stream.mp4';
+const heroAudio = '/videos/032ff2e1-6364-4ee0-8378-b3d5c0a3be83-audio.mp4';
 
 export default function HeroSection({ onExploreAssessment }) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);

@@ -12,9 +12,9 @@
 *.sketch             filter=lfs diff=lfs merge=lfs -text
 
 # ---------------------------------------------------------------------------
-# Video
+# Video — mp4 served from public/ as static assets (NOT LFS, Vercel compat)
 # ---------------------------------------------------------------------------
-*.mp4                filter=lfs diff=lfs merge=lfs -text
+# *.mp4 intentionally excluded — videos are in public/videos/ folder
 *.mov                filter=lfs diff=lfs merge=lfs -text
 *.avi                filter=lfs diff=lfs merge=lfs -text
 *.mkv                filter=lfs diff=lfs merge=lfs -text
