@@ -288,6 +288,7 @@ export default function HeroSection({ onExploreAssessment }) {
                 <line x1="17" y1="9" x2="23" y2="15" />
               </svg>
             )}
+          </button>
         </div>
       </section>
 
