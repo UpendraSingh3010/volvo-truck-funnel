@@ -73,25 +73,69 @@ export default function HowItWorksSection() {
   // Scroll progress (0 to 100%) through the steps container
   const [progressPercent, setProgressPercent] = useState(0);
 
-  // ── Track continuous scroll progress down the route lane ────────────────────
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
+  const isRafRunningRef = useRef(false);
+
+  // ── Track continuous scroll progress down the route lane with smooth physics ───
   useEffect(() => {
-    const handleScroll = () => {
-      if (!stepsContainerRef.current) return;
-      const rect = stepsContainerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+    const updateTarget = () => {
+      const firstStep = stepRefs.current[0];
+      const lastStep = stepRefs.current[stepRefs.current.length - 1];
 
-      // Start progress when container top enters upper-middle viewport
-      const startOffset = windowHeight * 0.45;
-      const totalScrollable = rect.height - windowHeight * 0.25;
-      const currentScroll = startOffset - rect.top;
+      if (!firstStep || !lastStep) {
+        if (!stepsContainerRef.current) return;
+        const rect = stepsContainerRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const startOffset = windowHeight * 0.48;
+        const totalScrollable = rect.height - windowHeight * 0.28;
+        const currentScroll = startOffset - rect.top;
+        const pct = Math.max(0, Math.min(100, (currentScroll / Math.max(1, totalScrollable)) * 100));
+        targetProgressRef.current = pct;
+      } else {
+        const firstRect = firstStep.getBoundingClientRect();
+        const lastRect = lastStep.getBoundingClientRect();
+        const viewportCenter = window.innerHeight * 0.48;
 
-      const pct = Math.max(0, Math.min(100, (currentScroll / Math.max(1, totalScrollable)) * 100));
-      setProgressPercent(pct);
+        const startY = firstRect.top + firstRect.height * 0.25;
+        const endY = lastRect.top + lastRect.height * 0.75;
+        const totalDistance = endY - startY;
+        const scrolled = viewportCenter - startY;
+
+        const pct = Math.max(0, Math.min(100, (scrolled / Math.max(1, totalDistance)) * 100));
+        targetProgressRef.current = pct;
+      }
+
+      // Kick off silky smooth frame-by-frame interpolation loop
+      if (!isRafRunningRef.current) {
+        isRafRunningRef.current = true;
+        requestAnimationFrame(smoothGlide);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    const smoothGlide = () => {
+      const diff = targetProgressRef.current - currentProgressRef.current;
+      // Damped spring / lerp motion until target reached
+      if (Math.abs(diff) > 0.05) {
+        currentProgressRef.current += diff * 0.12;
+        setProgressPercent(currentProgressRef.current);
+        requestAnimationFrame(smoothGlide);
+      } else {
+        currentProgressRef.current = targetProgressRef.current;
+        setProgressPercent(targetProgressRef.current);
+        isRafRunningRef.current = false;
+      }
+    };
+
+    window.addEventListener('scroll', updateTarget, { passive: true });
+    window.addEventListener('resize', updateTarget, { passive: true });
+    updateTarget();
+
+    return () => {
+      window.removeEventListener('scroll', updateTarget);
+      window.removeEventListener('resize', updateTarget);
+      isRafRunningRef.current = false;
+    };
   }, []);
 
   // ── Per-step IntersectionObserver — triggers step reveal animations ────────
@@ -171,7 +215,7 @@ export default function HowItWorksSection() {
 
                 {/* Active Dynamic Blue Route Lane Fill (Above Truck) */}
                 <div
-                  className="absolute top-0 w-2 bg-gradient-to-b from-[#0F2B46] via-[#1C4E80] to-[#38BDF8] shadow-[0_0_14px_rgba(56,189,248,0.85)] transition-all duration-100 ease-out rounded-b-sm"
+                  className="absolute top-0 w-2 bg-gradient-to-b from-[#0F2B46] via-[#1C4E80] to-[#38BDF8] shadow-[0_0_14px_rgba(56,189,248,0.85)] rounded-b-sm will-change-[height]"
                   style={{ height: `${progressPercent}%` }}
                 />
               </div>
@@ -206,7 +250,7 @@ export default function HowItWorksSection() {
                   HERO TRUCK TRANSPORT INDICATOR (64px Focal Point)
                  ═════════════════════════════════════════════════════════════ */}
               <div
-                className="absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-100 ease-out z-30"
+                className="absolute -translate-x-1/2 -translate-y-1/2 z-30 will-change-[top]"
                 style={{
                   left: '50%',
                   top: `${progressPercent}%`,
