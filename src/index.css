@@ -70,3 +70,144 @@ body {
 .border-light {
   border-bottom: 1px solid #E5E7EB;
 }
+
+/* ─── Hero: Word Reveal ─────────────────────────────────────── */
+@keyframes wordReveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-word {
+  display: inline-block;
+  opacity: 0;
+  animation: wordReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ─── Hero: Stats Marquee ────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Hero: Scroll Chevron ───────────────────────────────────── */
+@keyframes chevronBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 0.7; }
+  50%       { transform: translateX(-50%) translateY(7px); opacity: 1;   }
+}
+
+.scroll-chevron {
+  animation: chevronBounce 1.6s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+
+/* ─── Idea Section: Gradient Border & Brand Glow ───────────── */
+.idea-card-border {
+  position: relative;
+  border-radius: 6px;
+  padding: 1.5px;
+  background: linear-gradient(
+    135deg,
+    rgba(56, 189, 248, 0.4) 0%,
+    rgba(28, 78, 128, 0.6) 45%,
+    rgba(59, 130, 246, 0.4) 100%
+  );
+  box-shadow: 
+    0 0 20px -2px rgba(56, 189, 248, 0.2),
+    0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.idea-card-border:hover {
+  background: linear-gradient(
+    135deg,
+    #38BDF8 0%,
+    #60A5FA 50%,
+    #38BDF8 100%
+  );
+  box-shadow:
+    0 0 30px 3px rgba(56, 189, 248, 0.55),
+    0 0 52px 6px rgba(37, 99, 235, 0.35),
+    0 16px 36px -6px rgba(0, 0, 0, 0.65);
+  transform: translateY(-6px);
+}
+
+/* ─── Sustainability: Animated Plume Comparison ───────────── */
+@keyframes plumeFloat {
+  0% {
+    transform: translateY(0) scale(0.85);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-7px) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-15px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.plume-animate-1 {
+  animation: plumeFloat 2.2s ease-out infinite;
+}
+.plume-animate-2 {
+  animation: plumeFloat 2.2s ease-out 0.75s infinite;
+}
+.plume-animate-3 {
+  animation: plumeFloat 2.2s ease-out 1.5s infinite;
+}
+.plume-clean {
+  animation: plumeFloat 2.8s ease-out 0.4s infinite;
+}
+
+/* ─── Wizard: Step Slide Animation ────────────────────────── */
+@keyframes stepSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.step-slide-animate {
+  animation: stepSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Closing CTA: Ken Burns Effect ──────────────────────── */
+@keyframes kenBurns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.07);
+  }
+}
+
+.ken-burns-animate {
+  animation: kenBurns 12s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+
+
+
+

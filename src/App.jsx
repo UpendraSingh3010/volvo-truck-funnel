@@ -32,8 +32,8 @@ function AppContent() {
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>
-      {/* Footer rendered globally on inner pages, while HomePage concludes with the integrated single-screen footer in ClosingCTA */}
-      {!isHomePage && <Footer />}
+      {/* Premium closing statement Footer rendered globally across all pages */}
+      <Footer />
     </div>
   );
 }

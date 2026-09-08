@@ -1,24 +1,38 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from '../layout/Container';
-import Eyebrow from '../common/Eyebrow';
-import Button from '../common/Button';
 import VideoModal from '../common/VideoModal';
-// Videos served from public/ folder as static assets (Vercel-compatible, no LFS)
-const heroVideo = '/videos/87838aa2-33d5-45b3-a870-04e685a614ae-stream.mp4';
-const heroAudio = '/videos/032ff2e1-6364-4ee0-8378-b3d5c0a3be83-audio.mp4';
+
+import heroVideo from '../../assets/videos/volvo_road_train_final2.mp4';
 
 export default function HeroSection({ onExploreAssessment }) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [showChevron, setShowChevron] = useState(true);
 
   const videoRef = useRef(null);
-  const audioRef = useRef(null);
   const navigate = useNavigate();
 
-  // Ensure video starts playing from start (currentTime = 0) and is muted when component mounts / hero is viewed
+  // Open Film Modal: pause background video so playback/audio don't collide
+  const handleOpenFilm = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+    setIsVideoOpen(true);
+  }, []);
+
+  // Close Film Modal: resume background video smoothly
+  const handleCloseFilm = useCallback(() => {
+    setIsVideoOpen(false);
+    if (videoRef.current) {
+      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+  }, []);
+
+  // Ensure video starts playing from start (currentTime = 0) and is muted when component mounts
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
@@ -35,8 +49,19 @@ export default function HeroSection({ onExploreAssessment }) {
     }
   }, []);
 
+  // Hide scroll chevron after user scrolls 50 px
+  useEffect(() => {
+    const onScroll = () => setShowChevron(window.scrollY < 50);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Primary Button: Smooth scroll to Assessment section or navigate to assessment route
   const handleAssessmentClick = () => {
-    if (onExploreAssessment) {
+    const el = document.getElementById('assessment-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else if (onExploreAssessment) {
       onExploreAssessment();
     } else {
       navigate('/assessment');
@@ -59,30 +84,24 @@ export default function HeroSection({ onExploreAssessment }) {
     if (videoRef.current.paused) {
       videoRef.current.play().then(() => {
         setIsPlaying(true);
-        if (isAudioPlaying && audioRef.current) {
-          audioRef.current.play().catch(() => {});
-        }
       });
     } else {
       videoRef.current.pause();
       setIsPlaying(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
     }
   };
 
-  // Soundtrack audio toggle (small icon only)
+  // Soundtrack audio toggle: unmuting/muting native audio of the video
   const toggleHeroAudio = () => {
-    if (!audioRef.current || !videoRef.current) return;
+    if (!videoRef.current) return;
 
     if (isAudioPlaying) {
-      audioRef.current.pause();
+      videoRef.current.muted = true;
       setIsAudioPlaying(false);
     } else {
-      // Sync audio time with current video time
-      audioRef.current.currentTime = videoRef.current.currentTime % (audioRef.current.duration || 60);
-      audioRef.current.play().then(() => {
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1;
+      videoRef.current.play().then(() => {
         setIsAudioPlaying(true);
       }).catch((e) => {
         console.warn("Audio playback error:", e);
@@ -98,7 +117,7 @@ export default function HeroSection({ onExploreAssessment }) {
   return (
     <>
       <section className="relative h-[100dvh] max-h-[100dvh] w-full bg-[#0F2B46] flex flex-col justify-end pb-8 sm:pb-12 md:pb-14 pt-[72px] overflow-hidden select-none">
-        {/* Full-bleed hero film - Autoplaying, muted, loop */}
+        {/* Full-bleed hero film - Autoplaying, muted, loop with baked-in video text */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <video
             ref={videoRef}
@@ -113,61 +132,49 @@ export default function HeroSection({ onExploreAssessment }) {
             className="w-full h-full object-cover object-center"
           />
 
-          {/* Hidden audio element for optional unmuted sync */}
-          <audio
-            ref={audioRef}
-            src={heroAudio}
-            loop
-          />
-
-          {/* Minimal, soft dark overlay so video remains clearly visible while text is crisp */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F2B46]/75 via-black/25 to-black/35 pointer-events-none" />
+          {/* Minimal soft bottom vignette so video text and graphics stay crisp while grounding buttons */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F2B46]/75 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        <Container className="relative z-10">
-          <div className="max-w-[780px]">
-            {/* Eyebrow */}
-            <Eyebrow light={true} className="!mb-2 sm:!mb-3 drop-shadow-sm font-semibold text-[11px] sm:text-[13px]">
-              INDIA'S FIRST AND ONLY ROAD TRAIN
-            </Eyebrow>
+        {/* Action CTA Buttons */}
+        <Container className="relative z-10 pb-2 sm:pb-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5 max-w-[700px]">
+            {/* Primary Button */}
+            <button
+              onClick={handleAssessmentClick}
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 sm:px-8 sm:py-4 bg-white hover:bg-slate-100 text-[#0F2B46] font-semibold text-sm sm:text-base rounded-[3px] shadow-[0_8px_30px_rgba(0,0,0,0.45)] transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <span>See if Road Train fits your operation</span>
+              <span className="text-xl leading-none">→</span>
+            </button>
 
-            {/* H1 */}
-            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-[68px] leading-[1.06] tracking-tight font-medium mb-3 sm:mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
-              Moving More.<br />With Less.
-            </h1>
-
-            {/* Sub-headline */}
-            <p className="text-[#F2F4F6] text-sm sm:text-base md:text-[18px] leading-relaxed max-w-[680px] mb-6 sm:mb-8 font-normal drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
-              One Volvo prime mover. Multiple trailers.{' '}
-              <strong className="text-white font-medium underline decoration-white/40 underline-offset-4">
-                30 lakh+
-              </strong>{' '}
-              kilometres on Indian roads — with{' '}
-              <strong className="text-white font-medium underline decoration-white/40 underline-offset-4">
-                zero
-              </strong>{' '}
-              accidents. A new way to move India's freight: more tonnes per trip, fewer trucks on the road, lower cost per kilometre.
-            </p>
-
-            {/* Primary & Secondary CTA */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-              <Button
-                variant="white"
-                onClick={handleAssessmentClick}
-                className="py-3 px-6 sm:py-3.5 sm:px-8 text-sm sm:text-base shadow-lg"
-              >
-                See if Road Train fits your operation →
-              </Button>
-              <Button
-                variant="linkWhite"
-                onClick={() => setIsVideoOpen(true)}
-                className="text-sm sm:text-base drop-shadow-md hover:underline cursor-pointer"
-              >
-                Watch the film ▸
-              </Button>
-            </div>
+            {/* Secondary Button: Watch the film */}
+            <button
+              type="button"
+              onClick={handleOpenFilm}
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 sm:px-7 sm:py-4 bg-[#0F2B46]/75 hover:bg-[#0F2B46]/95 text-white font-medium text-sm sm:text-base rounded-[3px] backdrop-blur-md border border-white/30 hover:border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-sky-400">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              <span>Watch the film</span>
+            </button>
           </div>
         </Container>
+
+        {/* Scroll indicator chevron — bottom-centre, fades out after 50 px scroll */}
+        <div
+          className="scroll-chevron absolute bottom-7 left-1/2 z-20 pointer-events-none"
+          style={{ opacity: showChevron ? 1 : 0 }}
+          aria-hidden="true"
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="rgba(255,255,255,0.60)" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
 
         {/* Media Controls in Bottom Right: Circular Play/Pause bar + Small Soundtrack Icon */}
         <div className="absolute bottom-6 right-6 z-20 flex items-center gap-3">
@@ -252,9 +259,8 @@ export default function HeroSection({ onExploreAssessment }) {
       {/* Interactive Film Modal */}
       <VideoModal
         isOpen={isVideoOpen}
-        onClose={() => setIsVideoOpen(false)}
+        onClose={handleCloseFilm}
         videoSrc={heroVideo}
-        audioSrc={heroAudio}
       />
     </>
   );
