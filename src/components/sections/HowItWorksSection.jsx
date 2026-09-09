@@ -162,7 +162,7 @@ export default function HowItWorksSection() {
   const stationPercentages = [0, 33.33, 66.66, 100];
 
   return (
-    <section className="relative w-full bg-white border-b border-[#E2E8F0] overflow-hidden select-none">
+    <section id="how-it-works" className="relative w-full bg-white border-b border-[#E2E8F0] overflow-hidden select-none">
       {/* ── Section Header ────────────────────────────────────────────── */}
       <div className="pt-16 md:pt-24 pb-8 md:pb-12 border-b border-slate-100">
         <Container>
@@ -174,20 +174,15 @@ export default function HowItWorksSection() {
               </h2>
             </div>
 
-            {/* Operational Corridor Telemetry Badge */}
-            <div className="relative group cursor-pointer self-start md:self-end">
-              {/* Subtle soft blue glow behind badge on hover */}
-              <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-sky-400/18 via-blue-600/12 to-cyan-400/15 blur-md opacity-0 group-hover:opacity-60 group-hover:blur-md transition-all duration-400 pointer-events-none" />
-
-              <div className="relative flex items-center gap-2.5 px-4 py-2 rounded-[3px] bg-[#0F2B46] group-hover:bg-gradient-to-br group-hover:from-[#113252] group-hover:via-[#0F2B46] group-hover:to-[#0C243B] border border-[#1C4E80]/70 group-hover:border-[#38BDF8] shadow-[0_4px_16px_rgba(15,43,70,0.18)] group-hover:shadow-[0_10px_20px_rgba(15,43,70,0.25),0_0_12px_rgba(56,189,248,0.12)] transition-all duration-300 transform group-hover:-translate-y-0.5">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#38BDF8] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#38BDF8]" />
-                </span>
-                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-[#BAE6FD] group-hover:text-white transition-colors font-semibold">
-                  ACTIVE TRANSPORT ROUTE · 4 PHASES
-                </span>
-              </div>
+            {/* Operational Corridor Telemetry Badge — flat, no glow */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-[#0F2B46] border border-[#1C4E80]/60 self-start md:self-end">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#38BDF8] opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#38BDF8]" />
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#BAE6FD] font-semibold">
+                Active Transport Route · 4 Phases
+              </span>
             </div>
           </div>
         </Container>

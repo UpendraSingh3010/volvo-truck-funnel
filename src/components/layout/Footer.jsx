@@ -71,19 +71,19 @@ export default function Footer() {
               </p>
 
               {/* Highway Compliance Badge */}
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded bg-[#0A1F33] border border-[#1C4E80]/70 w-fit text-[11px] font-mono text-slate-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+              <div className="flex items-center gap-2.5 px-3 py-2 bg-[#0A1F33] border border-[#1C4E80]/70 w-fit text-[11px] font-mono text-slate-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
                 <span>Indian Highway Corridor Homologation</span>
               </div>
 
               {/* Site Credits */}
-              <div className="mt-5 flex items-center gap-2.5 px-3 py-2 border border-white/20 rounded-[10px] w-fit bg-white/[0.03] backdrop-blur-[10px]">
+              <div className="mt-5 flex items-center gap-2.5 px-3 py-2 border border-white/15 w-fit bg-white/[0.03]">
                 <a
                   href="https://fabulousmedia.in"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="FabulousMedia"
-                  className="flex items-center justify-center bg-white p-[4px] rounded-[6px] opacity-60 hover:opacity-100 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(253,181,20,0.5)] transition-all duration-[350ms] ease-out"
+                  className="flex items-center justify-center bg-white p-[4px] opacity-55 hover:opacity-100 hover:-translate-y-0.5 transition-all duration-300 ease-out"
                 >
                   <img
                     src="https://play.fabulousmedia.in/sitecredit/images/fabulousmedia.svg"
@@ -99,7 +99,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="GoCommercially"
-                  className="flex items-center justify-center bg-white p-[4px] rounded-[6px] opacity-60 hover:opacity-100 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(253,181,20,0.5)] transition-all duration-[350ms] ease-out"
+                  className="flex items-center justify-center bg-white p-[4px] opacity-55 hover:opacity-100 hover:-translate-y-0.5 transition-all duration-300 ease-out"
                 >
                   <img
                     src="https://play.fabulousmedia.in/sitecredit/images/gocommercially.svg"
@@ -284,7 +284,7 @@ export default function Footer() {
                 <button
                   type="button"
                   onClick={() => handleScrollTo('assessment-section')}
-                  className="mt-2 w-full py-2.5 px-3 rounded-[3px] bg-[#143D66]/60 hover:bg-[#143D66] border border-[#38BDF8]/40 hover:border-[#38BDF8] text-[#BAE6FD] hover:text-white font-medium text-xs text-center transition-all duration-200 cursor-pointer"
+                  className="mt-2 w-full py-2.5 px-3 bg-[#0F2B46] hover:bg-[#163859] border border-[#1C4E80]/60 hover:border-white/20 text-[#BAE6FD] hover:text-white font-medium text-xs text-center transition-all duration-200 cursor-pointer"
                 >
                   Book Technical Consultation →
                 </button>
@@ -309,13 +309,13 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[11.5px]">
-            <Link to="/" className="hover:text-[#38BDF8] transition-colors">
+            <Link to="/" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/" className="hover:text-[#38BDF8] transition-colors">
+            <Link to="/" className="hover:text-white transition-colors">
               Terms of Use
             </Link>
-            <Link to="/" className="hover:text-[#38BDF8] transition-colors">
+            <Link to="/" className="hover:text-white transition-colors">
               MoRTH Regulatory Framework
             </Link>
             <span className="text-slate-400 font-mono text-[10.5px]">

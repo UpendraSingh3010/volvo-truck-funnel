@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Container from '../layout/Container';
 import VideoModal from '../common/VideoModal';
 
-import heroVideo from '../../assets/videos/volvo_road_train_final2.mp4';
+import desktopHeroVideo from '../../assets/videos/volvo_road_train_final2.mp4';
+import mobileHeroVideo from '../../assets/videos/volvo_road_train_mobile_final.mp4';
 
 export default function HeroSection({ onExploreAssessment }) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -12,8 +13,42 @@ export default function HeroSection({ onExploreAssessment }) {
   const [progress, setProgress] = useState(0);
   const [showChevron, setShowChevron] = useState(true);
 
+  // Responsive device view detection (< 1024px for tablet & mobile)
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1024;
+    }
+    return false;
+  });
+
+  const activeVideo = isMobileOrTablet ? mobileHeroVideo : desktopHeroVideo;
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 1024;
+      setIsMobileOrTablet((prev) => (prev !== isMobile ? isMobile : prev));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const videoRef = useRef(null);
   const navigate = useNavigate();
+
+  // Reload and play when active video changes between desktop and mobile
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.load();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+    }
+  }, [activeVideo]);
 
   // Open Film Modal: pause background video so playback/audio don't collide
   const handleOpenFilm = useCallback(() => {
@@ -151,12 +186,16 @@ export default function HeroSection({ onExploreAssessment }) {
 
   return (
     <>
-      <section className="relative h-[100dvh] max-h-[100dvh] w-full bg-[#0F2B46] flex flex-col justify-end pb-8 sm:pb-12 md:pb-14 pt-[72px] overflow-hidden select-none">
-        {/* Full-bleed hero film - Autoplaying, muted, loop with baked-in video text */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
+      <section className="relative h-[100dvh] max-h-[100dvh] w-full bg-[#071727] flex flex-col justify-end pb-6 sm:pb-10 lg:pb-14 pt-[72px] overflow-hidden select-none">
+        {/* Hero film - Tablet/Mobile starts below header so it is never hidden or cut from up; Desktop full-bleed */}
+        <div
+          onClick={togglePlayPause}
+          className="absolute top-[72px] lg:top-0 inset-x-0 bottom-0 z-0 overflow-hidden flex items-start lg:items-center justify-center bg-[#071727] cursor-pointer"
+          title="Click to pause or resume video"
+        >
           <video
             ref={videoRef}
-            src={heroVideo}
+            src={activeVideo}
             autoPlay
             muted
             loop
@@ -164,33 +203,47 @@ export default function HeroSection({ onExploreAssessment }) {
             onTimeUpdate={handleTimeUpdate}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-contain lg:object-cover object-top lg:object-center"
           />
 
+          {/* Centered touch play indicator on mobile/tablet when paused */}
+          {!isPlaying && isMobileOrTablet && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="w-14 h-14 rounded-full bg-black/60 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-2xl">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="ml-1 text-white">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+              </div>
+            </div>
+          )}
+
           {/* Minimal soft bottom vignette so video text and graphics stay crisp while grounding buttons */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F2B46]/75 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 lg:h-48 bg-gradient-to-t from-[#071727]/90 via-[#071727]/40 to-transparent pointer-events-none" />
         </div>
 
-        {/* Action CTA Buttons */}
-        <Container className="relative z-10 pb-4 sm:pb-6">
-          <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2.5 sm:gap-5 w-full sm:w-auto max-w-[700px]">
+        {/* Action CTA Buttons - Reserved width on mobile so right bottom corner never overlaps */}
+        <Container className="relative z-10 pb-3.5 sm:pb-6">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 sm:gap-4 max-w-[calc(100%-46px)] sm:max-w-[700px]"
+          >
             {/* Primary Button */}
             <button
               onClick={handleAssessmentClick}
-              className="inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 py-3 sm:px-8 sm:py-4 bg-white hover:bg-slate-100 text-[#0F2B46] font-semibold text-xs sm:text-base rounded-[3px] shadow-[0_8px_30px_rgba(0,0,0,0.45)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer text-center"
+              className="inline-flex items-center justify-center gap-1 sm:gap-2 px-2.5 py-2.5 sm:px-8 sm:py-4 bg-white hover:bg-slate-100 text-[#0F2B46] font-semibold text-[11px] sm:text-base rounded-[3px] shadow-[0_8px_30px_rgba(0,0,0,0.45)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer text-center truncate"
             >
               <span className="hidden sm:inline">See if Road Train fits your operation</span>
               <span className="sm:hidden">Assess Route</span>
-              <span className="text-sm sm:text-xl leading-none">→</span>
+              <span className="text-xs sm:text-xl leading-none">→</span>
             </button>
 
             {/* Secondary Button: Watch the film */}
             <button
               type="button"
               onClick={handleOpenFilm}
-              className="inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 py-3 sm:px-7 sm:py-4 bg-[#0F2B46]/80 hover:bg-[#0F2B46]/95 text-white font-medium text-xs sm:text-base rounded-[3px] backdrop-blur-md border border-white/30 hover:border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer text-center"
+              className="inline-flex items-center justify-center gap-1 sm:gap-2 px-2.5 py-2.5 sm:px-7 sm:py-4 bg-[#0F2B46]/85 hover:bg-[#0F2B46]/95 text-white font-medium text-[11px] sm:text-base rounded-[3px] backdrop-blur-md border border-white/30 hover:border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer text-center truncate"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="text-sky-400 shrink-0 sm:w-[18px] sm:h-[18px]">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-sky-400 shrink-0 sm:w-[18px] sm:h-[18px]">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
               <span>Watch Film</span>
@@ -212,16 +265,15 @@ export default function HeroSection({ onExploreAssessment }) {
           </svg>
         </div>
 
-        {/* Media Controls in Bottom Right: Circular Play/Pause bar + Small Soundtrack Icon */}
-        <div className="absolute bottom-4 right-3 sm:bottom-6 sm:right-6 z-20 flex items-center gap-2 sm:gap-3">
-          {/* Circular Play/Pause Button with Video Progress Bar */}
-          <div className="relative w-9 h-9 sm:w-12 sm:h-12 flex items-center justify-center">
+        {/* Media Controls in Bottom Right Corner: Play/Pause ring (Desktop only) + Independent Mute Button */}
+        <div className="absolute bottom-3.5 right-2.5 sm:bottom-6 sm:right-6 z-30 flex items-center gap-2 sm:gap-3 pointer-events-auto">
+          {/* Circular Play/Pause Button with Video Progress Bar — Desktop (lg+) Only */}
+          <div className="hidden lg:flex relative w-12 h-12 items-center justify-center">
             {/* SVG Progress Ring */}
             <svg
               className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none"
               viewBox="0 0 48 48"
             >
-              {/* Background Ring */}
               <circle
                 cx="24"
                 cy="24"
@@ -230,7 +282,6 @@ export default function HeroSection({ onExploreAssessment }) {
                 stroke="rgba(255, 255, 255, 0.25)"
                 strokeWidth="2.5"
               />
-              {/* Progress Ring */}
               <circle
                 cx="24"
                 cy="24"
@@ -245,43 +296,38 @@ export default function HeroSection({ onExploreAssessment }) {
               />
             </svg>
 
-            {/* Play / Pause Toggle Button */}
             <button
               onClick={togglePlayPause}
               aria-label={isPlaying ? "Pause video" : "Play video"}
               title={isPlaying ? "Pause video" : "Play video"}
-              className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
+              className="w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
             >
               {isPlaying ? (
-                // Pause Icon
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="sm:w-[14px] sm:h-[14px]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                   <rect x="6" y="4" width="4" height="16" rx="1" />
                   <rect x="14" y="4" width="4" height="16" rx="1" />
                 </svg>
               ) : (
-                // Play Icon
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5 sm:w-[14px] sm:h-[14px]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5">
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
               )}
             </button>
           </div>
 
-          {/* Small Soundtrack Icon Only Button */}
+          {/* Small Soundtrack / Mute Button — Always cleanly in the bottom right corner without overlapping */}
           <button
             onClick={toggleHeroAudio}
             aria-label={isAudioPlaying ? "Mute soundtrack" : "Unmute soundtrack"}
             title={isAudioPlaying ? "Mute soundtrack" : "Play soundtrack"}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 hover:text-white border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/55 hover:bg-black/80 backdrop-blur-md text-white/90 hover:text-white border border-white/30 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95 shrink-0"
           >
             {isAudioPlaying ? (
-              // Speaker with sound waves icon
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px]">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                 <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
               </svg>
             ) : (
-              // Speaker with slash / mute icon
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px]">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                 <line x1="23" y1="9" x2="17" y2="15" />
@@ -296,7 +342,7 @@ export default function HeroSection({ onExploreAssessment }) {
       <VideoModal
         isOpen={isVideoOpen}
         onClose={handleCloseFilm}
-        videoSrc={heroVideo}
+        videoSrc={activeVideo}
       />
     </>
   );
