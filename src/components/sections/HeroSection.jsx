@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Container from '../layout/Container';
 import VideoModal from '../common/VideoModal';
 
-import desktopHeroVideo from '../../assets/videos/volvo_road_train_final2.mp4';
+import desktopHeroVideo from '../../assets/videos/volvo_final_20s.mp4';
 import mobileHeroVideo from '../../assets/videos/volvo_road_train_mobile_final.mp4';
 
 export default function HeroSection({ onExploreAssessment }) {
@@ -21,7 +21,7 @@ export default function HeroSection({ onExploreAssessment }) {
     return false;
   });
 
-  const activeVideo = isMobileOrTablet ? mobileHeroVideo : desktopHeroVideo;
+  const activeVideo = desktopHeroVideo;
 
   useEffect(() => {
     const handleResize = () => {
@@ -187,15 +187,16 @@ export default function HeroSection({ onExploreAssessment }) {
   return (
     <>
       <section className="relative h-[100dvh] max-h-[100dvh] w-full bg-[#071727] flex flex-col justify-end pb-6 sm:pb-10 lg:pb-14 pt-[72px] overflow-hidden select-none">
-        {/* Hero film - Tablet/Mobile starts below header so it is never hidden or cut from up; Desktop full-bleed */}
+        {/* Hero film - Full bleed with carefully calibrated object position to prevent cutting truck while filling width */}
         <div
           onClick={togglePlayPause}
-          className="absolute top-[72px] lg:top-0 inset-x-0 bottom-0 z-0 overflow-hidden flex items-start lg:items-center justify-center bg-[#071727] cursor-pointer"
+          className="absolute inset-0 z-0 overflow-hidden flex items-center justify-center bg-[#071727] cursor-pointer"
           title="Click to pause or resume video"
         >
+          {/* Main Hero Video */}
           <video
             ref={videoRef}
-            src={activeVideo}
+            src={desktopHeroVideo}
             autoPlay
             muted
             loop
@@ -203,7 +204,7 @@ export default function HeroSection({ onExploreAssessment }) {
             onTimeUpdate={handleTimeUpdate}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
-            className="w-full h-full object-contain lg:object-cover object-top lg:object-center"
+            className="w-full h-full object-cover object-[center_45%]"
           />
 
           {/* Centered touch play indicator on mobile/tablet when paused */}
@@ -217,8 +218,8 @@ export default function HeroSection({ onExploreAssessment }) {
             </div>
           )}
 
-          {/* Minimal soft bottom vignette so video text and graphics stay crisp while grounding buttons */}
-          <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 lg:h-48 bg-gradient-to-t from-[#071727]/90 via-[#071727]/40 to-transparent pointer-events-none" />
+          {/* Very subtle bottom grounding gradient for buttons — keeps full bottom video content crisp & clear */}
+          <div className="absolute inset-x-0 bottom-0 h-16 sm:h-20 bg-gradient-to-t from-[#071727]/80 via-[#071727]/20 to-transparent pointer-events-none z-10" />
         </div>
 
         {/* Action CTA Buttons - Reserved width on mobile so right bottom corner never overlaps */}

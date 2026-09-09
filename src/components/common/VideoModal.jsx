@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import defaultVideo from '../../assets/videos/volvo_road_train_final2.mp4';
+import defaultVideo from '../../assets/videos/volvo_final_20s.mp4';
 
 export default function VideoModal({
   isOpen,
